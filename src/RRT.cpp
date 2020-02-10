@@ -40,7 +40,17 @@ int RRT::extend( Point x ) {
 }
 
 Point RRT::randomState() {
-    return *( this->g1++ );
+    double threshold = 50;    // threshold for goal skewing
+    Point p = *( this->g1++ );  // random point, used for determining whether to goal skew or now
+    double probability = abs( p.x() ) + abs( p.y() ) / ( 2*this->size ) * 100; //
+
+    if( probability > threshold ) {
+        cout << "skew to goal" << endl;
+        return this->goal;
+    } else {
+        cout << "random" << endl;
+        return *( this->g1++ );
+    }
 }
 Point RRT::nearestNeighbor( Point x ) {
     Vertex_handle handleToTheNearestPoint = this->T->V.nearest_vertex( x );
