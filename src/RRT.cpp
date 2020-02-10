@@ -5,7 +5,7 @@
 
 
 RRT::RRT( RRT_Tree &tree, Point start, Point goal ) :
-    T( &tree ), start( start ), goal( goal ), K( 2000 ), size( 50 ), epsilon( 2 ), g1( this->size ) {
+    T( &tree ), start( start ), goal( goal ), K( 2000 ), size( 50 ), epsilon( 1.61 ), goalSkewProbability( 36 ), g1( this->size ) {
 
     cout << "start: " << this->start.x() << "," << this->start.y() << endl;
     cout <<  "goal: " << this->goal.x()  << "," << this->goal.y()  << endl;
@@ -40,11 +40,10 @@ int RRT::extend( Point x ) {
 }
 
 Point RRT::randomState() {
-    double threshold = 50;    // threshold for goal skewing
     Point p = *( this->g1++ );  // random point, used for determining whether to goal skew or now
-    double probability = abs( p.x() ) + abs( p.y() ) / ( 2*this->size ) * 100; //
+    double chance = abs( p.x() ) + abs( p.y() ) / ( 2*this->size ) * 100; //
 
-    if( probability > threshold ) {
+    if( chance < this->goalSkewProbability ) {
         cout << "skew to goal" << endl;
         return this->goal;
     } else {

@@ -13,6 +13,7 @@ class RRT {
     unsigned size = 50;   // size of random number bounds (from origin)
     unsigned K = 2000;    // number of samples to take
     double epsilon = 2.0; // distance can travel in one discrete time increment
+    double goalSkewProbability = 36;
     Random_points_in_square_2<Point,Creator> g1; // random point iterator
     RRT_Tree *T;
     Point start;
