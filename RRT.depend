@@ -371,18 +371,36 @@
 	"UnitDiskCoverUnitGrid.h"
 	"CgalComponents.h"
 
-1581283139 source:/home/matt/RRT/src/RRT.cpp
+1581358376 source:/home/matt/RRT/src/RRT.cpp
 	"RRT.h"
 	"CgalComponents.h"
+	<CGAL/Delaunay_triangulation_2.h>
+	<CGAL/nearest_neighbor_delaunay_2.h>
 
-1581289706 /home/matt/RRT/include/RRT.h
+1581358834 /home/matt/RRT/include/RRT.h
 	"CgalComponents.h"
+	"RRT_Tree.h"
 
-1581287933 source:/home/matt/RRT/main.cpp
-	"UnitDiskCoverPrinter.h"
+1581359127 source:/home/matt/RRT/main.cpp
+	"RRTPrinter.h"
 	"UnitDiskCoverCenters.h"
 	"UnitDiskCoverUnitGrid.h"
 	"RRT.h"
+	"RRT_Tree.h"
 	"CgalComponents.h"
 	<chrono>
+
+1581359452 source:/home/matt/RRT/src/RRTPrinter.cpp
+	"RRTPrinter.h"
+	<iostream>
+
+1581358896 /home/matt/RRT/include/RRTPrinter.h
+	"CgalComponents.h"
+	"RRT_Tree.h"
+	<vector>
+
+1581351401 /home/matt/RRT/include/RRT_Tree.h
+	"CgalComponents.h"
+
+1581352151 source:/home/matt/RRT/src/RRT_Tree.cpp
 

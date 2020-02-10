@@ -36,13 +36,15 @@
 		</Compiler>
 		<Unit filename="include/CgalComponents.h" />
 		<Unit filename="include/RRT.h" />
+		<Unit filename="include/RRTPrinter.h" />
+		<Unit filename="include/RRT_Tree.h" />
 		<Unit filename="include/UnitDiskCoverCenters.h" />
-		<Unit filename="include/UnitDiskCoverPrinter.h" />
 		<Unit filename="include/UnitDiskCoverUnitGrid.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/RRT.cpp" />
+		<Unit filename="src/RRTPrinter.cpp" />
+		<Unit filename="src/RRT_Tree.cpp" />
 		<Unit filename="src/UnitDiskCoverCenters.cpp" />
-		<Unit filename="src/UnitDiskCoverPrinter.cpp" />
 		<Unit filename="src/UnitDiskCoverUnitGrid.cpp" />
 		<Extensions>
 			<code_completion />
