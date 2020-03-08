@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.1.11)  10 FEB 2020 13:36
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.1.11)  21 FEB 2020 10:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -434,15 +434,15 @@ e
 
 ] (./someOutput.aux) ) 
 Here is how much of TeX's memory you used:
- 13750 strings out of 492982
- 285439 string characters out of 6134896
- 401163 words of memory out of 5000000
- 17112 multiletter control sequences out of 15000+600000
+ 11707 strings out of 492982
+ 238812 string characters out of 6134896
+ 267583 words of memory out of 5000000
+ 15069 multiletter control sequences out of 15000+600000
  3640 words of font info for 14 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,5n,56p,108645b,376s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 55i,5n,56p,391b,374s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on someOutput.pdf (1 page, 33821 bytes).
+Output written on someOutput.pdf (1 page, 1278 bytes).
 PDF statistics:
  11 PDF objects out of 1000 (max. 8388607)
  7 compressed objects within 1 object stream

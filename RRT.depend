@@ -262,7 +262,7 @@
 1581004657 /home/matt/RRT/include/BiniazEtAls.h
 	"CgalComponents.h"
 
-1581004657 /home/matt/RRT/include/CgalComponents.h
+1583692050 /home/matt/RRT/include/CgalComponents.h
 	<vector>
 	<list>
 	<algorithm>
@@ -273,11 +273,14 @@
 	<string>
 	<random>
 	<chrono>
+	<boost/graph/adjacency_list.hpp>
 	<CGAL/point_generators_2.h>
 	<CGAL/random_convex_set_2.h>
 	<CGAL/algorithm.h>
 	<CGAL/random_selection.h>
 	<CGAL/Delaunay_triangulation_2.h>
+	<CGAL/Triangulation_vertex_base_with_info_2.h>
+	<CGAL/Point_set_2.h>
 	<CGAL/squared_distance_2.h>
 	<CGAL/Circular_kernel_intersections.h>
 	<CGAL/Exact_circular_kernel_2.h>
@@ -371,36 +374,44 @@
 	"UnitDiskCoverUnitGrid.h"
 	"CgalComponents.h"
 
-1581358376 source:/home/matt/RRT/src/RRT.cpp
+1583518921 source:/home/matt/RRT/src/RRT.cpp
 	"RRT.h"
 	"CgalComponents.h"
 	<CGAL/Delaunay_triangulation_2.h>
 	<CGAL/nearest_neighbor_delaunay_2.h>
+	<unordered_map>
 
-1581358834 /home/matt/RRT/include/RRT.h
+1583692050 /home/matt/RRT/include/RRT.h
 	"CgalComponents.h"
-	"RRT_Tree.h"
+	"Node.h"
 
-1581359127 source:/home/matt/RRT/main.cpp
-	"RRTPrinter.h"
-	"UnitDiskCoverCenters.h"
-	"UnitDiskCoverUnitGrid.h"
+1583513553 source:/home/matt/RRT/main.cpp
+	"CgalComponents.h"
+	"reactphysics3d-0.7.1/src/reactphysics3d.h"
 	"RRT.h"
-	"RRT_Tree.h"
-	"CgalComponents.h"
-	<chrono>
 
-1581359452 source:/home/matt/RRT/src/RRTPrinter.cpp
+1582990148 source:/home/matt/RRT/src/RRTPrinter.cpp
 	"RRTPrinter.h"
 	<iostream>
 
-1581358896 /home/matt/RRT/include/RRTPrinter.h
+1582989916 /home/matt/RRT/include/RRTPrinter.h
 	"CgalComponents.h"
-	"RRT_Tree.h"
+	"RRT.h"
 	<vector>
 
-1581351401 /home/matt/RRT/include/RRT_Tree.h
+1582058410 /home/matt/RRT/include/RRT_Tree.h
 	"CgalComponents.h"
 
-1581352151 source:/home/matt/RRT/src/RRT_Tree.cpp
+1582052794 source:/home/matt/RRT/src/RRT_Tree.cpp
+
+1582307911 /home/matt/RRT/include/RRT_Node.h
+
+1582236050 source:/home/matt/RRT/src/RRT_Node.cpp
+	"RRT_Node.h"
+
+1583691302 /home/matt/RRT/include/Node.h
+	"CgalComponents.h"
+
+1583691218 source:/home/matt/RRT/src/Node.cpp
+	"Node.h"
 
