@@ -10,48 +10,49 @@
 using namespace MAG;
 
 MAG::RRT::RRT( Point startPoint, Point goalPoint ) :
-                                        start( startPoint, std::nullopt ),
-                                        goal( goalPoint, std::nullopt ),
+                                        start( startPoint ),
+                                        goal( goalPoint ),
                                         K( 2500 ),
                                         size( 25 ),
                                         epsilon( 1 ),
-                                        goalSkewProbability( 0 ),
+                                        goalSkewProbability( 1.63 ),
                                         g1( size ),
-                                        T(K) {
+                                        T(K)
+                                            {
 
-    optional<MAG::Node> lastNodeInGoalPath = this->buildRRT();
+    optional<vertex_descriptor> lastNodeInGoalPath = buildRRT();
 
-    if( lastNodeInGoalPath ) {
-        MAG::Node walk = *lastNodeInGoalPath;
-        while( *walk.parent ) {
-//            cout << *walk.parent << endl;
-            path.push_front( walk );
-            walk = T.at( *walk.parent );
-        }
-        path.push_front( start );
-//        for( auto p:path ) {
-//            cout << p << endl;
+//    if( lastNodeInGoalPath ) {
+//        vertex_descriptor walk = *lastNodeInGoalPath;
+//        while( *walk.parent ) {
+////            cout << *walk.parent << endl;
+//            path.push_front( walk );
+//            walk = T[*walk.parent];
 //        }
-    }
+//        path.push_front( start );
+////        for( auto p:path ) {
+////            cout << p << endl;
+////        }
+//    }
 }
 
-optional<MAG::Node> MAG::RRT::buildRRT() {
+optional<vertex_descriptor> MAG::RRT::buildRRT() {
     Point rand;
     // Initialize T with start location
-    this->insertIntoTree( this->start.p, std::nullopt );
+    insertIntoTree( start, std::nullopt );
 
-    for( unsigned k=0; k<(this->K); k++ ) {
-        rand = this->randomState();    // generate random point
-        this->extend( rand );
+    for( unsigned k=0; k<K; k++ ) {
+        rand = randomState();    // generate random point
+        extend( rand );
     }
-    return this->goalTest();
+    return goalTest();
 }
 
-optional<MAG::Node> MAG::RRT::goalTest() {
+optional<vertex_descriptor> MAG::RRT::goalTest() {
     // get nearest point to goal
-    MAG::Node nearest = T.at( this->nearestNeighbor( goal.p ) );
+    vertex_descriptor nearest = nearestNeighbor( goal );
     // check distance between nearest and goal
-    if( CGAL::squared_distance( nearest.p, goal.p ) < 1 ) {
+    if( CGAL::squared_distance( T[nearest].p, goal ) < 1 ) {
         cout << "goal found" << endl;
         return nearest;
     } else {
@@ -64,14 +65,14 @@ bool MAG::RRT::pathExists() {
     return this->path.size() > 0;
 }
 
-Vertex_handle MAG::RRT::insertIntoTree( Point p, optional<unsigned> parentIndex ) {
+void MAG::RRT::insertIntoTree( Point p, optional<vertex_descriptor> parent ) {
     Vertex_handle dtVertex;
     vertex_descriptor treeVertex;
 
-    treeVertex = boost::add_vertex( {p}, Tb ); // add vertex to T
-    if( parentIndex ) // if parentIndex is set, add an edge from parentIndex to new vertex
-        boost::add_edge( treeVertex, parentIndex );
-    dtVertex = Dtb.insert( p ); // add point to delaunay triangulation
+    treeVertex = boost::add_vertex( {p}, T ); // add vertex to T
+    if( parent ) // if parentIndex is set, add an edge from parentIndex to new vertex
+        boost::add_edge( treeVertex, *parent, T );
+    dtVertex = Dt.insert( p ); // add point to delaunay triangulation
     dtVertex->info() = treeVertex; // store vertex descriptor in dt
 
 
@@ -79,29 +80,28 @@ Vertex_handle MAG::RRT::insertIntoTree( Point p, optional<unsigned> parentIndex 
 
     // PRE-boost implementation
         //cout << node.p << " " << node.parent->p << endl;
-    Vertex_handle vh;
-    MAG::Node node;
-    vh = this->Dt.insert( p );
-    vh->info() = currentIndex;
-
-    if( parentIndex )
-        this->T.insert( T.begin()+currentIndex, MAG::Node( p, *parentIndex ) );
-    else
-        this->T.insert( T.begin()+currentIndex, MAG::Node( p ) );
-
-    currentIndex++;
-
-    return vh;
+//    Vertex_handle vh;
+//    MAG::Node node;
+//    vh = this->Dt.insert( p );
+//    vh->info() = currentIndex;
+//
+//    if( parentIndex )
+//        this->T.insert( T.begin()+currentIndex, MAG::Node( p, *parentIndex ) );
+//    else
+//        this->T.insert( T.begin()+currentIndex, MAG::Node( p ) );
+//
+//    currentIndex++;
+//
+//    return vh;
 }
 
 int MAG::RRT::extend( Point x ) {
-    // TODO: determine the correct way to pass near to Node constructor (to set parent of xNew)
-    unsigned near = this->nearestNeighbor( x );
-    optional<Point> xNew = this->newState( x, this->T.at(near).p, false );
+    vertex_descriptor near = nearestNeighbor( x );
+    optional<Point> xNew = newState( x, T[near].p, false );
 
     if( xNew ) {
         //cout<< near->info() << endl;
-        this->insertIntoTree( *xNew, near );
+        insertIntoTree( *xNew, near );
 
         if( *xNew == x ) {
             return REACHED;
@@ -113,25 +113,28 @@ int MAG::RRT::extend( Point x ) {
 }
 
 Point MAG::RRT::randomState() {
-    Point p = *( this->g1++ );  // random point, used for determining whether to goal skew or now
-    double chance = abs( p.x() ) + abs( p.y() ) / ( 2*this->size ) * 100; //
+    Point p = randomPoint();  // random point, used for determining whether to goal skew or now
+    double chance = abs( p.x() ) + abs( p.y() ) / ( 2*size ) * 100; //
 
-    if( chance < this->goalSkewProbability ) {
+    if( chance < goalSkewProbability ) {
 //        cout << "skew to goal" << endl;
-        return this->goal.p;
+        return goal;
     } else {
 //        cout << "random" << endl;
-        return *( this->g1++ );
+        return randomPoint();
     }
 }
+Point MAG::RRT::randomPoint() {
+    return *( g1++ );
+}
 
-unsigned MAG::RRT::nearestNeighbor( Point x ) {
-    return this->Dt.nearest_vertex( x )->info();
+vertex_descriptor MAG::RRT::nearestNeighbor( Point x ) {
+    return Dt.nearest_vertex( x )->info();
 }
 
 list<Vertex_handle> MAG::RRT::nearestNeighbors( Point p, int k ) {
     std::list<Vertex_handle> L;
-    nearest_neighbors( this->Dt, p, k, std::back_inserter(L));
+    nearest_neighbors( Dt, p, k, std::back_inserter(L));
     return L;
 }
 
@@ -166,42 +169,42 @@ void MAG::RRT::displayPDF( string fileName ) {
     fprintf(fp,"\\documentclass{standalone} \n\\usepackage{tikz} \n \n\n\\begin{document}\n");
     fprintf(fp,"\n\n\n\\begin{tikzpicture}\n\n");
 
-    // print all explored paths
-    for( auto it=T.begin(); it<T.end(); it++ ) {
-        if( it->parent ) {
-            fprintf(
-                fp,
-                "\\draw [gray,thin] (%f,%f) -- (%f,%f);",
-                it->p.x(),
-                it->p.y(),
+    typename boost::graph_traits<Graph>::edge_iterator ei, ei_end;
+    for( boost::tie(ei, ei_end) = boost::edges(T); ei != ei_end; ++ei ) {
+        Point p = T[source(*ei, T)].p;
+        Point q = T[target(*ei, T)].p;
+        fprintf(
+            fp,
+            "\\draw [gray,thin] (%f,%f) -- (%f,%f);",
+            p.x(),
+            p.y(),
 //                it->p.x()+1,
 //                it->p.y()+1
-                T.at(*it->parent).p.x(),
-                T.at(*it->parent).p.y()
-            );
-            //cout<< *it->parent << endl;
-        }
+            q.x(),
+            q.y()
+        );
+        //cout<< *it->parent << endl;
     }
-    if( this->pathExists() ) {
-        //print goal path
-        for( auto it=path.begin(), next=std::next(it,1); next!=path.end(); it++, next++ ) {
-            fprintf(
-                fp,
-                "\\draw [purple,ultra thick] (%f,%f) -- (%f,%f);",
-                it->p.x(),
-                it->p.y(),
-                next->p.x(),
-                next->p.y()
-//                T.at(*it->parent).p.x(),
-//                T.at(*it->parent).p.y()
-            );
-            //cout<< *it->parent << endl;
-        }
-    }
+//    if( this->pathExists() ) {
+//        //print goal path
+//        for( auto it=path.begin(), next=std::next(it,1); next!=path.end(); it++, next++ ) {
+//            fprintf(
+//                fp,
+//                "\\draw [purple,ultra thick] (%f,%f) -- (%f,%f);",
+//                it->p.x(),
+//                it->p.y(),
+//                next->p.x(),
+//                next->p.y()
+////                T.at(*it->parent).p.x(),
+////                T.at(*it->parent).p.y()
+//            );
+//            //cout<< *it->parent << endl;
+//        }
+//    }
 
     // print start and goal
-    fprintf( fp,"\\draw [fill=red,stroke=red] (%f,%f) circle [radius=%f];\n",start.p.x(),start.p.y(),radiusOfPoints );
-    fprintf( fp,"\\draw [fill=green,stroke=green] (%f,%f) circle [radius=%f];\n",goal.p.x(),goal.p.y(),radiusOfPoints );
+    fprintf( fp,"\\draw [fill=red,stroke=red] (%f,%f) circle [radius=%f];\n",start.x(),start.y(),radiusOfPoints );
+    fprintf( fp,"\\draw [fill=green,stroke=green] (%f,%f) circle [radius=%f];\n",goal.x(),goal.y(),radiusOfPoints );
 
     fprintf(fp,"\n\n\\end{tikzpicture}");
     fprintf(fp,"\n\n\\end{document}");

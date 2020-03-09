@@ -65,17 +65,17 @@ typedef K::Segment_2                     Segment;
 typedef Creator_uniform_2<double,Point>  Creator;
 typedef Circle_2<K> Circle;
 typedef Iso_rectangle_2<K> Rectangle;
+namespace MAG {
+    struct vertex_info {
+        Point p;
+    };
+    struct edge_info {
 
-struct vertex_info {
-    Point p;
-};
-struct edge_info {
-
-};
-
-typedef boost::adjacency_list<boost::listS, boost::listS, boost::undirectedS, vertex_info, edge_info> Graph;
+    };
+}
+typedef boost::adjacency_list<boost::listS, boost::listS, boost::undirectedS, MAG::vertex_info, MAG::edge_info> Graph;
 typedef boost::graph_traits<Graph>::vertex_descriptor vertex_descriptor;
-typedef CGAL::Triangulation_vertex_base_with_info_2<unsigned, K> Vb;
+typedef CGAL::Triangulation_vertex_base_with_info_2<vertex_descriptor, K> Vb;
 typedef CGAL::Triangulation_data_structure_2<Vb> Tds;
 typedef CGAL::Delaunay_triangulation_2<K, Tds> DelaunayTriangulation;
 typedef DelaunayTriangulation::Vertex_handle Vertex_handle;
