@@ -5,46 +5,60 @@
 #include "CgalComponents.h"
 //#include "Node.h"
 
-typedef boost::adjacency_list<boost::listS, boost::listS, boost::undirectedS, MAG::vertex_info, MAG::edge_info> Graph;
 
 namespace MAG {
 
-    class RRT {
+class RRT {
 
-        public:
-            Point start;
-            Point goal;
-            unsigned size;   // size of random number bounds (from origin)
-            unsigned K;    // number of samples to take
-            double epsilon; // distance can travel in one discrete time increment
-            double goalSkewProbability;
+public:
+    /* Types */
+        enum Result { Advanced, Trapped, Reached };
+        typedef boost::adjacency_list<boost::listS, boost::listS, boost::undirectedS, MAG::vertex_info, MAG::edge_info> Graph;
 
-            RRT( Point start, Point goal );
-            bool go();
-            bool pathExists();
-            list<Point> getPath();
-            void displayPDF( string outputFileName );
+    /* Public data members */
+        Point start;
+        Point goal;
+        unsigned size;          // size of random number bounds (from origin)
+        unsigned K;             // number of samples to take
+        double epsilon;         // distance can travel in one discrete time increment
+        DelaunayTriangulation nearestNeighborTree;
+        Graph T;
+        CGAL::Random_points_in_square_2<Point,Creator> g1; // random point iterator
+        std::optional<Point> last;  // the latest point to be added to the tree
 
-        private:
-            DelaunayTriangulation Dt;
-            Graph T;
+    /* Constructor(s) */
+        RRT( Point startPoint, Point goalPoint, double step=2, int maxNodes=2000, double goalSkewProbability=2 );
 
-            list<vertex_descriptor> path;
-            unsigned currentIndex = 0;
-            Random_points_in_square_2<Point,Creator> g1; // random point iterator
+    /* Public member functions */
+        virtual bool go();
+        bool pathExists();
+        std::list<Point> getPath();
+        void setGoalSkewProbability( double p );
+        void displayPDF( std::string outputFileName );
+        void insertIntoTree( DelaunayTriangulation &Dt, Point p, std::optional<vertex_descriptor> parent = std::nullopt );
+        bool goalTest( DelaunayTriangulation &Dt, Point target );
+        Point randomPoint();
+        vertex_descriptor nearestNeighbor( DelaunayTriangulation &Dt, Point x );
+        std::list<Vertex_handle> nearestNeighbors( DelaunayTriangulation &Dt, Point p, int k );
+        std::optional<Point> newState( Point x, Point xNear, bool uNew );
 
-            optional<vertex_descriptor> bidirectionalRRT();
-            optional<vertex_descriptor> buildRRT();
-            int extend( Point x );
-            optional<vertex_descriptor> goalTest();
 
-            void insertIntoTree( Point p, optional<vertex_descriptor> parent = std::nullopt );
-            Point randomState();
-            Point randomPoint();
-            vertex_descriptor nearestNeighbor( Point x );
-            list<Vertex_handle> nearestNeighbors( Point p, int k );
-            optional<Point> newState( Point x, Point xNear, bool uNew );
-    };
+    /* RRT specified functions */
+        virtual bool buildRRT();
+        bool path();
+        Result extend( DelaunayTriangulation &Dt, Point x );
+        Point randomState();
+
+
+
+private:
+    /* Private data members */
+        double goalSkewProbability;
+
+    /* Private member functions */
+
+};
+
 }
 
 #endif
