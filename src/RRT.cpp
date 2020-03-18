@@ -100,7 +100,7 @@ void MAG::RRT::displayPDF( std::string fileName ) {
 
 /* Private RRT specified functions */
 
-bool MAG::RRT::path() {
+std::list<Point> MAG::RRT::path() {
 
 }
 

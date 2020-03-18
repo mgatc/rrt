@@ -13,7 +13,6 @@ class RRT {
 public:
     /* Types */
         enum Result { Advanced, Trapped, Reached };
-        typedef boost::adjacency_list<boost::listS, boost::listS, boost::undirectedS, MAG::vertex_info, MAG::edge_info> Graph;
 
     /* Public data members */
         Point start;
@@ -32,7 +31,6 @@ public:
     /* Public member functions */
         virtual bool go();
         bool pathExists();
-        std::list<Point> getPath();
         void setGoalSkewProbability( double p );
         void displayPDF( std::string outputFileName );
         void insertIntoTree( DelaunayTriangulation &Dt, Point p, std::optional<vertex_descriptor> parent = std::nullopt );
@@ -45,7 +43,7 @@ public:
 
     /* RRT specified functions */
         virtual bool buildRRT();
-        bool path();
+        std::list<Point> path();
         Result extend( DelaunayTriangulation &Dt, Point x );
         Point randomState();
 

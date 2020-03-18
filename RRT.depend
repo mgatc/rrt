@@ -262,7 +262,7 @@
 1581004657 /home/matt/RRT/include/BiniazEtAls.h
 	"CgalComponents.h"
 
-1583692050 /home/matt/RRT/include/CgalComponents.h
+1584547707 /home/matt/RRT/include/CgalComponents.h
 	<vector>
 	<list>
 	<algorithm>
@@ -374,21 +374,18 @@
 	"UnitDiskCoverUnitGrid.h"
 	"CgalComponents.h"
 
-1583518921 source:/home/matt/RRT/src/RRT.cpp
+1584547753 source:/home/matt/RRT/src/RRT.cpp
 	"RRT.h"
 	"CgalComponents.h"
 	<CGAL/Delaunay_triangulation_2.h>
 	<CGAL/nearest_neighbor_delaunay_2.h>
-	<unordered_map>
 
-1583692050 /home/matt/RRT/include/RRT.h
+1584547707 /home/matt/RRT/include/RRT.h
 	"CgalComponents.h"
-	"Node.h"
 
-1583513553 source:/home/matt/RRT/main.cpp
+1584473047 source:/home/matt/RRT/main.cpp
 	"CgalComponents.h"
-	"reactphysics3d-0.7.1/src/reactphysics3d.h"
-	"RRT.h"
+	"BidirectionalRRT.h"
 
 1582990148 source:/home/matt/RRT/src/RRTPrinter.cpp
 	"RRTPrinter.h"
@@ -409,9 +406,19 @@
 1582236050 source:/home/matt/RRT/src/RRT_Node.cpp
 	"RRT_Node.h"
 
-1583691302 /home/matt/RRT/include/Node.h
+1584473047 /home/matt/RRT/include/Node.h
 	"CgalComponents.h"
 
-1583691218 source:/home/matt/RRT/src/Node.cpp
+1584473047 source:/home/matt/RRT/src/Node.cpp
 	"Node.h"
+
+1584473047 /home/matt/RRT/include/BidirectionalRRT.h
+	"CgalComponents.h"
+	"RRT.h"
+
+1584473047 source:/home/matt/RRT/src/BidirectionalRRT.cpp
+	"BidirectionalRRT.h"
+	"CgalComponents.h"
+	<CGAL/Delaunay_triangulation_2.h>
+	<CGAL/nearest_neighbor_delaunay_2.h>
 
