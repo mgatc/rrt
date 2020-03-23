@@ -1,44 +1,41 @@
 #include "RRT.h"
-#include "CgalComponents.h"
-#include <CGAL/Delaunay_triangulation_2.h>
-#include <CGAL/nearest_neighbor_delaunay_2.h>
-
-
 
 using namespace MAG;
 
-
+int ERRORTRACKER = 0;
 
 /* Constructor(s) */
 
-MAG::RRT::RRT( Point startPoint, Point goalPoint, double step, int maxNodes, double goalSkewProbability ) :
-                                        start( startPoint ),
-                                        goal( goalPoint ),
-                                        K( maxNodes ),
+RRT::RRT( Point startPoint, Point goalPoint, double step, int maxNodes, double goalSkewProbability )
+                                      : K( maxNodes ),
                                         size( 50 ),
                                         epsilon( step ),
                                         goalSkewProbability( goalSkewProbability ),
                                         g1( size ),
                                         T( K )
 {
-
+    startv.point = startPoint;
+    goalv.point = goalPoint;
+    weightMap = get( boost::edge_weight, T );
+    locationMap = get( boost::vertex_location, T );
 }
 
 
 
 /* Public member functions */
 
-bool MAG::RRT::go() {
+std::list<Vertex> RRT::go() {
+    init( startv.point, goalv.point );
     return buildRRT();
 }
 
-void MAG::RRT::setGoalSkewProbability( double p ) {
+void RRT::setGoalSkewProbability( double p ) {
     if( p < 0 )      goalSkewProbability = 0;
     else if( p > 1 ) goalSkewProbability = 1;
     else             goalSkewProbability = p;
 }
 
-void MAG::RRT::displayPDF( std::string fileName ) {
+void RRT::displayPDF( std::string fileName ) {
     double const radiusOfPoints = 1;
     std::string fName = fileName + ".tex";
     FILE *fp = fopen(fName.c_str() ,"w");
@@ -46,10 +43,12 @@ void MAG::RRT::displayPDF( std::string fileName ) {
     fprintf(fp,"\\documentclass{standalone} \n\\usepackage{tikz} \n \n\n\\begin{document}\n");
     fprintf(fp,"\n\n\n\\begin{tikzpicture}\n\n");
 
+    locationMap = get( boost::vertex_location, T );
+
     typename boost::graph_traits<Graph>::edge_iterator ei, ei_end;
     for( boost::tie(ei, ei_end) = boost::edges(T); ei != ei_end; ++ei ) {
-        Point p = T[source(*ei, T)].p;
-        Point q = T[target(*ei, T)].p;
+        Point p = locationMap[source(*ei, T)].point;
+        Point q = locationMap[target(*ei, T)].point;
         fprintf(
             fp,
             "\\draw [gray,thin] (%f,%f) -- (%f,%f);",
@@ -78,8 +77,8 @@ void MAG::RRT::displayPDF( std::string fileName ) {
 //    }
 
     // print start and goal
-    fprintf( fp,"\\draw [fill=red,stroke=red] (%f,%f) circle [radius=%f];\n",start.x(),start.y(),radiusOfPoints );
-    fprintf( fp,"\\draw [fill=green,stroke=green] (%f,%f) circle [radius=%f];\n",goal.x(),goal.y(),radiusOfPoints );
+    fprintf( fp,"\\draw [fill=red,stroke=red] (%f,%f) circle [radius=%f];\n",startv.point.x(),startv.point.y(),radiusOfPoints );
+    fprintf( fp,"\\draw [fill=green,stroke=green] (%f,%f) circle [radius=%f];\n",goalv.point.x(),goalv.point.y(),radiusOfPoints );
 
     fprintf(fp,"\n\n\\end{tikzpicture}");
     fprintf(fp,"\n\n\\end{document}");
@@ -100,49 +99,85 @@ void MAG::RRT::displayPDF( std::string fileName ) {
 
 /* Private RRT specified functions */
 
-std::list<Point> MAG::RRT::path() {
+std::list<Vertex> RRT::path() {
+    std::vector<GraphVertex> p( boost::num_vertices( T ) ); // predecessor map
+    std::vector<Cost> d( boost::num_vertices( T ) );        // distance map
 
+    boost::property_map< Graph, boost::vertex_index_t >::type vertex_id = boost::get( boost::vertex_index, T );
+    try {
+        boost::astar_search_tree(
+            T,                      // the graph
+            startv.graph,            // the start vertex
+            distance_heuristic< Graph, Cost, LocationMap >( locationMap, goalv.graph ),
+            boost::predecessor_map(
+                boost::make_iterator_property_map( p.begin(), vertex_id )
+            ).distance_map(
+                boost::make_iterator_property_map( d.begin(), vertex_id )
+            ).visitor(
+                astar_goal_visitor< GraphVertex, Cost, LocationMap >( locationMap, goalv.graph )
+            )
+        );
+    } catch( Vertex found ) { // found a path to the goal
+        // Check if vertex returned in found matches our goal exactly.
+
+        // If not, change goal
+        std::list<Vertex> shortest_path;
+
+        std::cout << "A* found the goal!" << std::endl;
+
+        for( GraphVertex v = found.graph;; v = p[v] ) {
+            shortest_path.push_front( locationMap(v) );
+            if( p[v] == v )
+                break;
+        }
+        std::cout << "Shortest path: ";
+
+        std::list<Vertex>::iterator spi = shortest_path.begin();
+
+        std::cout << locationMap[startv.graph].point;
+
+        for(++spi; spi != shortest_path.end(); ++spi)
+            std::cout << " -> " << locationMap[spi->graph].point;
+
+        std::cout << std::endl << "Total distance: " << d[goalv.graph] << std::endl;
+
+        return shortest_path;
+    }
+    std::cout << "A* didn't find the goal..." << std::endl;
+
+    return std::list<Vertex>();
 }
 
-bool MAG::RRT::buildRRT() {
+std::list<Vertex> RRT::buildRRT() {
     Point rand;
-    // Initialize T with start location
-    insertIntoTree( nearestNeighborTree, start, std::nullopt );
 
     for( unsigned k=0; k<K; k++ ) {
         rand = randomState();    // generate random point
         extend( nearestNeighborTree, rand );
     }
-    return goalTest( nearestNeighborTree, goal );
+    return path();
 }
 
-RRT::Result MAG::RRT::extend( DelaunayTriangulation &Dt, Point x ) {
-    vertex_descriptor near = nearestNeighbor( Dt, x );
-    std::optional<Point> xNew = newState( x, T[near].p, false );
+RRT::Result RRT::extend( DelaunayTriangulation &Dt, Point x ) {
+    GraphVertex near = nearestNeighbor( Dt, x );
+    //std::cout<< x << " " << locationMap[near].point << std::endl;
+
+    std::optional<Point> xNew = newState( x, locationMap[near].point, false );
     last = xNew;
     if( xNew ) {
-        //cout<< near->info() << endl;
         insertIntoTree( Dt, *xNew, near );
-        //last = { *xNew };
-
-        if( *xNew == x ) {
-            return Reached;
-        } else {
-            return Advanced;
-        }
-    } else {
-        //last = std::nullopt;
+        return ( *xNew == x ) ? Reached : Advanced;
     }
     return Trapped;
 }
 
-Point MAG::RRT::randomState() {
+Point RRT::randomState() {
     Point p = randomPoint();  // random point, used for determining whether to goal skew or now
-    double chance = abs( p.x() ) + abs( p.y() ) / ( 2*size ); //
+    double chance = CGAL::to_double( CGAL::abs( p.x() ) + CGAL::abs( p.y() ) ) / ( 2*size );
 
-    if( chance < goalSkewProbability ) {
+    if( chance < goalSkewProbability/100 ) {
 //        cout << "skew to goal" << endl;
-        return goal;
+        return goalv.point;
     } else {
 //        cout << "random" << endl;
         return randomPoint();
@@ -153,39 +188,77 @@ Point MAG::RRT::randomState() {
 
 /* Private member functions */
 
-void MAG::RRT::insertIntoTree( DelaunayTriangulation &Dt, Point p, std::optional<vertex_descriptor> parent ) {
-    Vertex_handle dtVertex;
-    vertex_descriptor treeVertex;
+void RRT::insertIntoTree( DelaunayTriangulation &Dt, Point p, std::optional<GraphVertex> parent ) {
+    Vertex vertex;
 
-    treeVertex = boost::add_vertex( {p}, T ); // add vertex to T
-    if( parent ) // if parentIndex is set, add an edge from parentIndex to new vertex
-        boost::add_edge( treeVertex, *parent, T );
-    dtVertex = Dt.insert( p ); // add point to delaunay triangulation
-    dtVertex->info() = treeVertex; // store vertex descriptor in dt
+    vertex = insertVertex( Dt, p );
+
+    if( parent ) { // if parentIndex is set, add an edge from parentIndex to new vertex
+        insertEdge( vertex.graph, *parent );
+    }
 }
 
-bool MAG::RRT::goalTest( DelaunayTriangulation &Dt, Point target ) {
-    // get nearest point to goal
-    vertex_descriptor nearest = nearestNeighbor( Dt, target );
-    // check distance between nearest and goal
-    return CGAL::squared_distance( T[nearest].p, target ) < 1;
+GraphEdge RRT::insertEdge( GraphVertex vertex, GraphVertex parent ) {
+    GraphEdge e;
+    bool inserted;
+    Point first, second;
+
+    first = locationMap[vertex].point;
+    second = locationMap[parent].point;
+
+    boost::tie( e, inserted ) = boost::add_edge( vertex, parent, T );
+    weightMap[e] = distanceBetween<Cost>( first, second );
+
+    return e;
 }
 
-Point MAG::RRT::randomPoint() {
+Vertex RRT::insertVertex( DelaunayTriangulation &Dt, Point p ) {
+    GraphVertex gv = boost::add_vertex( T );        // add vertex to T
+
+    locationMap[gv].handle = Dt.insert( p );        // add point to Dt
+    locationMap[gv].point = p; // get address of point from Dt
+    locationMap[gv].graph = gv;                     // add graph vertex
+    locationMap[gv].handle->info() = gv;         // store graph vertex in dt
+
+    //std::cout << "Vertex added: " << locationMap[gv].point << ", vertex given: " << p << std::endl;
+
+    return locationMap[gv];
+}
+
+void RRT::init( Point start, Point goal ) {
+
+    startv = insertVertex( nearestNeighborTree, start );
+    // Add goal vertex to T and locationMap, but not to nearestNeighborTree
+    GraphVertex gv = boost::add_vertex( T );    // add goal vertex to T
+    locationMap[gv].point = goal;               // add goal location to map
+    locationMap[gv].graph = gv;                 // add graph vertex
+
+    goalv = locationMap[gv];
+}
+
+//bool RRT::goalTest( DelaunayTriangulation &Dt, Point target ) {
+//    // get nearest point to goal
+//    GraphVertex nearest = nearestNeighbor( Dt, target );
+//    DtVertex nearest = locationMap[nearestNeighb]
+//    // check distance between nearest and goal
+//    return CGAL::squared_distance( T[nearest].p, target ) < 1;
+//}
+
+Point RRT::randomPoint() {
     return *( g1++ );
 }
 
-vertex_descriptor MAG::RRT::nearestNeighbor( DelaunayTriangulation &Dt, Point x ) {
+GraphVertex RRT::nearestNeighbor( DelaunayTriangulation &Dt, Point x ) {
     return Dt.nearest_vertex( x )->info();
 }
 
-std::list<Vertex_handle> MAG::RRT::nearestNeighbors( DelaunayTriangulation &Dt, Point p, int k ) {
-    std::list<Vertex_handle> L;
+std::list<DtVertex> RRT::nearestNeighbors( DelaunayTriangulation &Dt, Point p, int k ) {
+    std::list<DtVertex> L;
     nearest_neighbors( Dt, p, k, std::back_inserter(L));
     return L;
 }
 
-std::optional<Point> MAG::RRT::newState( Point x, Point xNear, bool uNew ) {
+std::optional<Point> RRT::newState( Point x, Point xNear, bool uNew ) {
 
     //DO COLLISION DETECTION HERE
 

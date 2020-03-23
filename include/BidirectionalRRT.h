@@ -17,14 +17,17 @@ public:
     /* Public member functions */
 //        bool go();
 
-private:
-    /* Private data members */
+protected:
+    /* Protected data members */
         DelaunayTriangulation nearestNeighborTreeB;
 
-    /* Private RRT specified functions */
-        bool buildRRT();
+    /* Protected RRT specified functions */
+        std::list<Vertex> buildRRT();
 
-    /* Private member functions */
+    /* Protected member functions */
+        void init( Point start, Point goal );
+
+private:
 
 };
 

@@ -11,7 +11,7 @@ using namespace MAG;
 
 /* Constructor(s) */
 
-MAG::BidirectionalRRT::BidirectionalRRT( Point startPoint, Point goalPoint, double step, int maxNodes ) :
+BidirectionalRRT::BidirectionalRRT( Point startPoint, Point goalPoint, double step, int maxNodes ) :
                                         RRT( startPoint, goalPoint, step, maxNodes, 0 )
 {
 
@@ -19,36 +19,30 @@ MAG::BidirectionalRRT::BidirectionalRRT( Point startPoint, Point goalPoint, doub
 
 
 
-/* Public member functions */
-
-//bool MAG::BidirectionalRRT::go() {
-//    return buildRRT();
-//}
-
-/* Private RRT specified functions */
-
-bool MAG::BidirectionalRRT::buildRRT() {
+std::list<Vertex> BidirectionalRRT::buildRRT() {
     Point rand;
 
-    // Initialize T with start location
-    insertIntoTree( nearestNeighborTree, start, std::nullopt );
-    insertIntoTree( nearestNeighborTreeB, goal, std::nullopt );
+//    // Initialize T with start location
+//    insertIntoTree( nearestNeighborTree, startv.point, std::nullopt );
+//    insertIntoTree( nearestNeighborTreeB, goalv.point, std::nullopt );
 
     for( unsigned k=0; k<K; k++ ) {
         rand = randomState();    // generate random point
-        if( ! extend( nearestNeighborTree, rand ) == Trapped ) {
-            if( last && extend( nearestNeighborTreeB, *last ) == Reached ) {
-                return true;
+        if( ! ( extend( nearestNeighborTree, rand ) == Trapped ) ) {
+            if( last && ( extend( nearestNeighborTreeB, *last ) == Reached ) ) {
+                // Trees do not connect properly here
+                return path();
             }
         }
         std::swap( nearestNeighborTree, nearestNeighborTreeB );
     }
-    return false;
+    return std::list<Vertex>();
 }
 
+void BidirectionalRRT::init( Point start, Point goal ) {
 
+    startv = insertVertex( nearestNeighborTree, start );
+    goalv = insertVertex( nearestNeighborTreeB, goal );
 
-/* Private member functions */
-
-
+}
 
