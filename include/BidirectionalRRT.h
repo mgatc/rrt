@@ -1,8 +1,8 @@
 #ifndef BIDIRECTIONALRRT_H
 #define BIDIRECTIONALRRT_H
 
-#include "CgalComponents.h"
-#include "RRT.h"
+#include "../include/CgalComponents.h"
+#include "../include/RRT.h"
 
 namespace MAG {
 

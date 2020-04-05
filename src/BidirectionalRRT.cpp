@@ -1,5 +1,5 @@
-#include "BidirectionalRRT.h"
-#include "CgalComponents.h"
+#include "../include/BidirectionalRRT.h"
+#include "../include/CgalComponents.h"
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/nearest_neighbor_delaunay_2.h>
 
@@ -28,7 +28,7 @@ std::list<Vertex> BidirectionalRRT::buildRRT() {
 
     for( unsigned k=0; k<K; k++ ) {
         rand = randomState();    // generate random point
-        if( ! ( extend( nearestNeighborTree, rand ) == Trapped ) ) {
+        if( extend( nearestNeighborTree, rand ) != Trapped  ) {
             if( last && ( extend( nearestNeighborTreeB, *last ) == Reached ) ) {
                 // Trees do not connect properly here
                 return path();

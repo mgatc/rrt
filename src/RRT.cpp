@@ -1,4 +1,4 @@
-#include "RRT.h"
+#include "../include/RRT.h"
 
 using namespace MAG;
 
@@ -44,6 +44,7 @@ void RRT::displayPDF( std::string fileName ) {
     fprintf(fp,"\n\n\n\\begin{tikzpicture}\n\n");
 
     locationMap = get( boost::vertex_location, T );
+    std::list<Vertex> bestPath = path();
 
     typename boost::graph_traits<Graph>::edge_iterator ei, ei_end;
     for( boost::tie(ei, ei_end) = boost::edges(T); ei != ei_end; ++ei ) {
@@ -57,28 +58,24 @@ void RRT::displayPDF( std::string fileName ) {
             q.x(),
             q.y()
         );
-        //cout<< *it->parent << endl;
     }
-//    if( this->pathExists() ) {
-//        //print goal path
-//        for( auto it=path.begin(), next=std::next(it,1); next!=path.end(); it++, next++ ) {
-//            fprintf(
-//                fp,
-//                "\\draw [purple,ultra thick] (%f,%f) -- (%f,%f);",
-//                it->p.x(),
-//                it->p.y(),
-//                next->p.x(),
-//                next->p.y()
-////                T.at(*it->parent).p.x(),
-////                T.at(*it->parent).p.y()
-//            );
-//            //cout<< *it->parent << endl;
-//        }
-//    }
+    if( !bestPath.empty() ) {
+        //print goal path
+        for( auto it=bestPath.begin(), next=std::next(it,1); next!=bestPath.end(); it++, next++ ) {
+            fprintf(
+                fp,
+                "\\draw [purple,ultra thick] (%f,%f) -- (%f,%f);",
+                it->point.x(),
+                it->point.y(),
+                next->point.x(),
+                next->point.y()
+            );
+        }
+    }
 
     // print start and goal
     fprintf( fp,"\\draw [fill=red,stroke=red] (%f,%f) circle [radius=%f];\n",startv.point.x(),startv.point.y(),radiusOfPoints );
-    fprintf( fp,"\\draw [fill=green,stroke=green] (%f,%f) circle [radius=%f];\n",goalv.point.x(),goalv.point.y(),radiusOfPoints );
+    fprintf( fp,"\\draw [fill=green,stroke=green] (%f,%f) circle [radius=%f];\n",goalv.point.x(),goalv.point.y(),GOAL_EPSILON );
 
     fprintf(fp,"\n\n\\end{tikzpicture}");
     fprintf(fp,"\n\n\\end{document}");

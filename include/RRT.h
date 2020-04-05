@@ -1,8 +1,8 @@
 #ifndef RRT_H
 #define RRT_H
 
-#include "CgalComponents.h"
-#include "Astar.h"
+#include "../include/CgalComponents.h"
+#include "../include/Astar.h"
 
 
 

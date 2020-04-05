@@ -133,6 +133,7 @@ namespace MAG {
         GraphVertex graph;
         DtVertex handle;
     };
+    const double GOAL_EPSILON = 2;
 
 //    typedef K::Segment_2
 //        Segment;

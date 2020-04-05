@@ -16,7 +16,12 @@ int main() {
     // environment
     // parameters like steering system, constraints, etc
 
-    //RRT rrt( start, goal, 2, 2000 );
+
+
+
+    // ASTAR CANNOT FIND THE GOAL IN BIDIRECTIONAL VARIANT
+
+    //RRT rrt( start, goal, GOAL_EPSILON, 2000 );
     BidirectionalRRT rrt( start, goal, 2, 2000 );
     //rrt.setGoalSkewProbability(50);
 

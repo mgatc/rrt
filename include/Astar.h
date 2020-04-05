@@ -1,8 +1,7 @@
 #ifndef ASTAR_H
 #define ASTAR_H
 
-#include "CgalComponents.h"
-
+#include "../include/CgalComponents.h"
 
 namespace MAG {
 
@@ -34,6 +33,10 @@ namespace MAG {
 
             }
             CostType operator()( GraphVertex u ) {
+
+//                CostType dx = m_location[m_goal].x - m_location[u].x;
+//                CostType dy = m_location[m_goal].y - m_location[u].y;
+//                return std::sqrt( dx * dx + dy * dy );
                 return distanceBetween<CostType>( m_location[m_goal].point, m_location[u].point );
             }
 
@@ -62,7 +65,7 @@ namespace MAG {
             }
         private:
             GVertex m_goal;
-            CostType epsilon = 2;
+            CostType epsilon = GOAL_EPSILON;
             LocMap m_location;
     };
 
