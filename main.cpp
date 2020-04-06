@@ -21,8 +21,8 @@ int main() {
 
     // ASTAR CANNOT FIND THE GOAL IN BIDIRECTIONAL VARIANT
 
-    //RRT rrt( start, goal, GOAL_EPSILON, 2000 );
-    BidirectionalRRT rrt( start, goal, 2, 2000 );
+    RRT rrt( start, goal, GOAL_EPSILON, 2000 );
+    //BidirectionalRRT rrt( start, goal, 15, 2000 );
     //rrt.setGoalSkewProbability(50);
 
     rrt.go();

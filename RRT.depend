@@ -262,35 +262,26 @@
 1581004657 /home/matt/RRT/include/BiniazEtAls.h
 	"CgalComponents.h"
 
-1584547707 /home/matt/RRT/include/CgalComponents.h
-	<vector>
+1586180849 /home/matt/RRT/include/CgalComponents.h
 	<list>
-	<algorithm>
-	<ctime>
-	<unordered_set>
 	<fstream>
-	<iterator>
 	<string>
-	<random>
-	<chrono>
+	<vector>
+	<iostream>
+	<math.h>
 	<boost/graph/adjacency_list.hpp>
-	<CGAL/point_generators_2.h>
-	<CGAL/random_convex_set_2.h>
-	<CGAL/algorithm.h>
-	<CGAL/random_selection.h>
-	<CGAL/Delaunay_triangulation_2.h>
-	<CGAL/Triangulation_vertex_base_with_info_2.h>
-	<CGAL/Point_set_2.h>
-	<CGAL/squared_distance_2.h>
-	<CGAL/Circular_kernel_intersections.h>
-	<CGAL/Exact_circular_kernel_2.h>
-	<CGAL/Orthogonal_k_neighbor_search.h>
-	<CGAL/Search_traits_2.h>
-	<CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
-	<CGAL/Algebraic_kernel_for_circles_2_2.h>
-	<CGAL/Circular_kernel_2.h>
-	<CGAL/Iso_rectangle_2.h>
+	<boost/graph/astar_search.hpp>
+	<boost/graph/random.hpp>
+	<boost/random.hpp>
+	<boost/property_map/property_map.hpp>
+	<boost/graph/graphviz.hpp>
 	<CGAL/Exact_predicates_inexact_constructions_kernel.h>
+	<CGAL/Delaunay_triangulation_2.h>
+	<CGAL/nearest_neighbor_delaunay_2.h>
+	<CGAL/Triangulation_vertex_base_with_info_2.h>
+	<CGAL/point_generators_2.h>
+	<CGAL/squared_distance_2.h>
+	<CGAL/number_utils.h>
 
 1581004657 source:/home/matt/RRT/src/BiniazEtAls2.cpp
 	"BiniazEtAls2.h"
@@ -374,16 +365,14 @@
 	"UnitDiskCoverUnitGrid.h"
 	"CgalComponents.h"
 
-1584547753 source:/home/matt/RRT/src/RRT.cpp
-	"RRT.h"
-	"CgalComponents.h"
-	<CGAL/Delaunay_triangulation_2.h>
-	<CGAL/nearest_neighbor_delaunay_2.h>
+1586180368 source:/home/matt/RRT/src/RRT.cpp
+	"../include/RRT.h"
 
-1584547707 /home/matt/RRT/include/RRT.h
-	"CgalComponents.h"
+1586179799 /home/matt/RRT/include/RRT.h
+	"../include/CgalComponents.h"
+	"../include/Astar.h"
 
-1584473047 source:/home/matt/RRT/main.cpp
+1586180141 source:/home/matt/RRT/main.cpp
 	"CgalComponents.h"
 	"BidirectionalRRT.h"
 
@@ -412,13 +401,19 @@
 1584473047 source:/home/matt/RRT/src/Node.cpp
 	"Node.h"
 
-1584473047 /home/matt/RRT/include/BidirectionalRRT.h
-	"CgalComponents.h"
-	"RRT.h"
+1586180016 /home/matt/RRT/include/BidirectionalRRT.h
+	"../include/CgalComponents.h"
+	"../include/RRT.h"
 
-1584473047 source:/home/matt/RRT/src/BidirectionalRRT.cpp
-	"BidirectionalRRT.h"
-	"CgalComponents.h"
+1586180129 source:/home/matt/RRT/src/BidirectionalRRT.cpp
+	"../include/BidirectionalRRT.h"
+	"../include/CgalComponents.h"
 	<CGAL/Delaunay_triangulation_2.h>
 	<CGAL/nearest_neighbor_delaunay_2.h>
+
+1584629554 source:/home/matt/RRT/include/Astar.h
+	"CgalComponents.h"
+
+1586180864 /home/matt/RRT/include/Astar.h
+	"../include/CgalComponents.h"
 
