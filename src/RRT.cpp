@@ -45,6 +45,7 @@ void RRT::displayPDF( std::string fileName ) {
 
     locationMap = get( boost::vertex_location, T );
     std::list<Vertex> bestPath = path();
+    std::cout << "start:"<<startv.graph << " goal:" << goalv.graph << std::endl;
 
     typename boost::graph_traits<Graph>::edge_iterator ei, ei_end;
     for( boost::tie(ei, ei_end) = boost::edges(T); ei != ei_end; ++ei ) {
@@ -58,6 +59,7 @@ void RRT::displayPDF( std::string fileName ) {
             q.x(),
             q.y()
         );
+        //std::cout << source(*ei, T) << "(" << locationMap[source(*ei,T)].point << ") <->" << target(*ei, T) << "(" << locationMap[target(*ei,T)].point << ")" << std::endl;
     }
     if( !bestPath.empty() ) {
         //print goal path
@@ -146,7 +148,7 @@ std::list<Vertex> RRT::path() {
 }
 
 std::list<Vertex> RRT::buildRRT() {
-    Point rand;
+    Vertex rand;
 
     for( unsigned k=0; k<K; k++ ) {
         rand = randomState();    // generate random point
@@ -155,29 +157,29 @@ std::list<Vertex> RRT::buildRRT() {
     return path();
 }
 
-RRT::Result RRT::extend( DelaunayTriangulation &Dt, Point x ) {
-    GraphVertex near = nearestNeighbor( Dt, x );
-    //std::cout<< x << " " << locationMap[near].point << std::endl;
+RRT::Result RRT::extend( DelaunayTriangulation &Dt, Vertex x ) {
+    GraphVertex near = nearestNeighbor( Dt, x.point );
 
-    std::optional<Point> xNew = newState( x, locationMap[near].point, false );
-    last = xNew;
+    std::optional<Vertex> xNew = newState( x, locationMap[near], false );
+
     if( xNew ) {
         insertIntoTree( Dt, *xNew, near );
-        return ( *xNew == x ) ? Reached : Advanced;
+        return ( xNew->point == x.point ) ? Reached : Advanced;
     }
     return Trapped;
 }
 
-Point RRT::randomState() {
+Vertex RRT::randomState() {
+    Vertex v;
     Point p = randomPoint();  // random point, used for determining whether to goal skew or now
     double chance = CGAL::to_double( CGAL::abs( p.x() ) + CGAL::abs( p.y() ) ) / ( 2*size );
 
     if( chance < goalSkewProbability/100 ) {
 //        cout << "skew to goal" << endl;
-        return goalv.point;
+        return goalv;
     } else {
 //        cout << "random" << endl;
-        return randomPoint();
+        return Vertex{ randomPoint() };
     }
 }
 
@@ -185,14 +187,15 @@ Point RRT::randomState() {
 
 /* Private member functions */
 
-void RRT::insertIntoTree( DelaunayTriangulation &Dt, Point p, std::optional<GraphVertex> parent ) {
-    Vertex vertex;
+Vertex RRT::insertIntoTree( DelaunayTriangulation &Dt, Vertex v, std::optional<GraphVertex> parent ) {
+    // if vertex already has gv, don't rebuild v
+    if( v.graph == NULL )
+        v = insertVertex( Dt, v.point );
 
-    vertex = insertVertex( Dt, p );
+    if( parent ) // if parent is set, add an edge from parentIndex to new vertex
+        insertEdge( v.graph, *parent );
 
-    if( parent ) { // if parentIndex is set, add an edge from parentIndex to new vertex
-        insertEdge( vertex.graph, *parent );
-    }
+    return v;
 }
 
 GraphEdge RRT::insertEdge( GraphVertex vertex, GraphVertex parent ) {
@@ -217,8 +220,6 @@ Vertex RRT::insertVertex( DelaunayTriangulation &Dt, Point p ) {
     locationMap[gv].graph = gv;                     // add graph vertex
     locationMap[gv].handle->info() = gv;         // store graph vertex in dt
 
-    //std::cout << "Vertex added: " << locationMap[gv].point << ", vertex given: " << p << std::endl;
-
     return locationMap[gv];
 }
 
@@ -232,14 +233,6 @@ void RRT::init( Point start, Point goal ) {
 
     goalv = locationMap[gv];
 }
-
-//bool RRT::goalTest( DelaunayTriangulation &Dt, Point target ) {
-//    // get nearest point to goal
-//    GraphVertex nearest = nearestNeighbor( Dt, target );
-//    DtVertex nearest = locationMap[nearestNeighb]
-//    // check distance between nearest and goal
-//    return CGAL::squared_distance( T[nearest].p, target ) < 1;
-//}
 
 Point RRT::randomPoint() {
     return *( g1++ );
@@ -255,7 +248,7 @@ std::list<DtVertex> RRT::nearestNeighbors( DelaunayTriangulation &Dt, Point p, i
     return L;
 }
 
-std::optional<Point> RRT::newState( Point x, Point xNear, bool uNew ) {
+std::optional<Vertex> RRT::newState( Vertex x, Vertex xNear, bool uNew ) {
 
     //DO COLLISION DETECTION HERE
 
@@ -263,8 +256,8 @@ std::optional<Point> RRT::newState( Point x, Point xNear, bool uNew ) {
         // return {};
 
     // make a move from xNear towards x under discrete time law
-    double a = x.x()-xNear.x(),   // horizontal difference
-           b = x.y()-xNear.y(),   // vertical difference
+    double a = x.point.x()-xNear.point.x(),   // horizontal difference
+           b = x.point.y()-xNear.point.y(),   // vertical difference
            c = sqrt( a*a + b*b ); // total difference
 
     if( c < epsilon )
@@ -272,10 +265,11 @@ std::optional<Point> RRT::newState( Point x, Point xNear, bool uNew ) {
 
     double factor = epsilon / c;
 
-    Point p = Point( xNear.x()+factor*(a), xNear.y()+factor*(b) );
+    Vertex v;
+    v.point = Point( xNear.point.x()+factor*(a), xNear.point.y()+factor*(b) );
 
     // returns the new state or failure notice
-    return {p};
+    return {v};
 }
 
 

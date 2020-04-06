@@ -14,9 +14,10 @@ namespace MAG {
 
     template< class CostType >
     CostType distanceBetween( Point p, Point q ) {
-        CostType dx = p.x() - q.x();
-        CostType dy = p.y() - q.y();
-        return std::sqrt( dx * dx + dy * dy );
+//        CostType dx = p.x() - q.x();
+//        CostType dy = p.y() - q.y();
+//        return std::sqrt( dx * dx + dy * dy );
+        return CGAL::sqrt<NumberType>( CGAL::squared_distance<K>( p, q ) );
     }
 
     /*
@@ -33,10 +34,6 @@ namespace MAG {
 
             }
             CostType operator()( GraphVertex u ) {
-
-//                CostType dx = m_location[m_goal].x - m_location[u].x;
-//                CostType dy = m_location[m_goal].y - m_location[u].y;
-//                return std::sqrt( dx * dx + dy * dy );
                 return distanceBetween<CostType>( m_location[m_goal].point, m_location[u].point );
             }
 
@@ -57,7 +54,7 @@ namespace MAG {
 
             template <class GraphType>
             void examine_vertex(GVertex u, GraphType& g) {
-                std::cout << m_location[u].point << std::endl;
+                //std::cout << m_location[u].point << std::endl;
                 if( u == m_goal || distanceBetween<CostType>( m_location[m_goal].point, m_location[u].point ) < epsilon ) {
                     Vertex v = { m_location[u].point, u };
                     throw v;

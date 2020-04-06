@@ -20,23 +20,32 @@ BidirectionalRRT::BidirectionalRRT( Point startPoint, Point goalPoint, double st
 
 
 std::list<Vertex> BidirectionalRRT::buildRRT() {
-    Point rand;
-
-//    // Initialize T with start location
-//    insertIntoTree( nearestNeighborTree, startv.point, std::nullopt );
-//    insertIntoTree( nearestNeighborTreeB, goalv.point, std::nullopt );
+    Vertex rand;
 
     for( unsigned k=0; k<K; k++ ) {
         rand = randomState();    // generate random point
         if( extend( nearestNeighborTree, rand ) != Trapped  ) {
             if( last && ( extend( nearestNeighborTreeB, *last ) == Reached ) ) {
-                // Trees do not connect properly here
                 return path();
             }
         }
         std::swap( nearestNeighborTree, nearestNeighborTreeB );
     }
+
     return std::list<Vertex>();
+}
+
+RRT::Result BidirectionalRRT::extend( DelaunayTriangulation &Dt, Vertex x ) {
+    GraphVertex near = nearestNeighbor( Dt, x.point );
+
+    std::optional<Vertex> xNew = newState( x, locationMap[near], false );
+
+    if( xNew ) {
+        last = { insertIntoTree( Dt, *xNew, near ) };
+        return ( xNew->point == x.point ) ? Reached : Advanced;
+    }
+    last = std::nullopt; // if no xNew, set last to null
+    return Trapped;
 }
 
 void BidirectionalRRT::init( Point start, Point goal ) {
@@ -45,4 +54,5 @@ void BidirectionalRRT::init( Point start, Point goal ) {
     goalv = insertVertex( nearestNeighborTreeB, goal );
 
 }
+
 

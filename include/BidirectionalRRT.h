@@ -20,12 +20,16 @@ public:
 protected:
     /* Protected data members */
         DelaunayTriangulation nearestNeighborTreeB;
+        std::optional<Vertex> last;  // the latest point to be added to the tree
 
     /* Protected RRT specified functions */
         std::list<Vertex> buildRRT();
+        Result extend( DelaunayTriangulation &Dt, Vertex x );
 
     /* Protected member functions */
         void init( Point start, Point goal );
+        //Vertex insertIntoTree( DelaunayTriangulation &Dt, Vertex v, std::optional<GraphVertex> parent );
+
 
 private:
 

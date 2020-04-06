@@ -3,19 +3,12 @@
 
 /********************** STL header files **************************/
 
-
 #include <list>                             // path output
 #include <fstream>                          // read from file
 #include <string>                           // string editing for output
 #include <vector>                           // A*
 #include <iostream>                         // A*
 #include <math.h>                           // for sqrt, A*
-//#include <algorithm>
-//#include <iterator>
-//#include <random>
-//#include <ctime>
-//#include <unordered_set>
-//#include <chrono>
 
 
 
@@ -27,14 +20,6 @@
 #include <boost/random.hpp>                             // A*
 #include <boost/property_map/property_map.hpp>          // A*
 #include <boost/graph/graphviz.hpp>                     // A*
-//#include <boost/thread/thread.hpp>
-
-// these were added to troubleshoot BOOST_INSTALL_PROPERTY not working
-//#include <boost/config.hpp>
-//#include <boost/version.hpp>
-//#include <boost/graph/graph_utility.hpp>
-//#include <boost/static_assert.hpp>
-
 
 
 
@@ -45,19 +30,8 @@
 #include <CGAL/nearest_neighbor_delaunay_2.h>                   // nearest neighbors
 #include <CGAL/Triangulation_vertex_base_with_info_2.h>         // nearest neighbors
 #include <CGAL/point_generators_2.h>                            // random point generation
-#include <CGAL/squared_distance_2.h>                            // goal test
-//#include <CGAL/algorithm.h>
-//#include <CGAL/Algebraic_kernel_for_circles_2_2.h>
-//#include <CGAL/Circular_kernel_2.h>
-//#include <CGAL/Iso_rectangle_2.h>
-//#include <CGAL/random_convex_set_2.h>
-//#include <CGAL/random_selection.h>
-//#include <CGAL/Point_set_2.h>
-//#include <CGAL/Circular_kernel_intersections.h>
-//#include <CGAL/Exact_circular_kernel_2.h>
-//#include <CGAL/Orthogonal_k_neighbor_search.h>
-//#include <CGAL/Search_traits_2.h>
-#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/squared_distance_2.h>                            // A*
+#include <CGAL/number_utils.h>                                  // A*
 
 
 
@@ -70,18 +44,19 @@ namespace boost {
 
 namespace MAG {
 
-//    typedef CGAL::Exact_predicates_exact_constructions_kernel
-//        K;
     typedef CGAL::Exact_predicates_inexact_constructions_kernel
         K;
 
     typedef K::Point_2
         Point;
 
-    typedef CGAL::Creator_uniform_2<double,Point>
+    typedef double
+        NumberType;
+
+    typedef CGAL::Creator_uniform_2< NumberType, Point >
         Creator;
 
-    typedef double
+    typedef NumberType
         Cost;
 
     struct Vertex;
@@ -118,34 +93,19 @@ namespace MAG {
 
     typedef boost::property_map< Graph, boost::vertex_location_t >::type
         LocationMap;
-//
-//    struct vertex_info {
-//        Point *point;
-//        //add getPoint function
-////        Point point() {
-////            DtVertex v = handle;
-////            return v->point();
-////        }
-//    };
 
     struct Vertex {
         Point point;
         GraphVertex graph;
         DtVertex handle;
+
+        Vertex operator=( Vertex rhs ) {
+            point = rhs.point;
+            graph = rhs.graph;
+            handle = rhs.handle;
+        }
     };
     const double GOAL_EPSILON = 2;
-
-//    typedef K::Segment_2
-//        Segment;
-//
-//    typedef CGAL::Circle_2<K>
-//        Circle;
-//
-//    typedef CGAL::Iso_rectangle_2<K>
-//        Rectangle;
-//
-//    typedef CGAL::Point_set_2<K, Tds>
-//        PS;
 
 }
 

@@ -39,24 +39,23 @@ protected:
         WeightMap weightMap;
         LocationMap locationMap;
         CGAL::Random_points_in_square_2<Point,Creator> g1; // random point iterator
-        std::optional<Point> last;  // the latest point to be added to the tree
 
     /* Protected member functions */
-        void insertIntoTree( DelaunayTriangulation &Dt, Point p, std::optional<GraphVertex> parent = std::nullopt );
+        virtual Vertex insertIntoTree( DelaunayTriangulation &Dt, Vertex v, std::optional<GraphVertex> parent = std::nullopt );
         GraphEdge insertEdge( GraphVertex vertex, GraphVertex parent );
         Vertex insertVertex( DelaunayTriangulation &Dt, Point p );
         bool goalTest( DelaunayTriangulation &Dt, Point target );
         Point randomPoint();
         GraphVertex nearestNeighbor( DelaunayTriangulation &Dt, Point x );
         std::list<DtVertex> nearestNeighbors( DelaunayTriangulation &Dt, Point p, int k );
-        std::optional<Point> newState( Point x, Point xNear, bool uNew );
+        std::optional<Vertex> newState( Vertex x, Vertex xNear, bool uNew );
         virtual void init( Point start, Point goal );
 
     /* RRT specified functions */
         virtual std::list<Vertex> buildRRT();
         std::list<Vertex> path();
-        Result extend( DelaunayTriangulation &Dt, Point x );
-        Point randomState();
+        virtual Result extend( DelaunayTriangulation &Dt, Vertex x );
+        Vertex randomState();
 
 
 
