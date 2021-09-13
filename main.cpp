@@ -1,32 +1,32 @@
-#include "CgalComponents.h"
-#include "BidirectionalRRT.h"
-//#include "reactphysics3d-0.7.1/src/reactphysics3d.h"
+#include "World.h"
 
 using namespace MAG;
+using namespace std;
 
-int main() {
-    //RRT_Tree T;
-    // Read input from file for map, start, goal, and parameters separately, as these inputs would likely originate from differing origins
-    int SIZE = 25;
-    CGAL::Random_points_in_square_2<Point,Creator> g1( SIZE ); // random point iterator
-    Point start( -20, -20 );
-    Point goal( 20, 20 );
-//    Point start( *( g1++ ) );
-//    Point goal( *( g1++ ) ); // may need to be more generally typed to support goal areas too
-    // environment
-    // parameters like steering system, constraints, etc
+int main( int argc, char *argv[] ) {
+
+    int grid_size = 100;
+    double density = 0.1;
+    int window_size = 1750;
+
+    if( argc >= 3 ){
+        stringstream convert{ argv[1] };
+
+        int grid_size_arg{};
+        if( ( convert >> grid_size_arg ) ) // do the conversion
+            grid_size = grid_size_arg;
+
+        int density_arg{};
+        if( ( convert >> density_arg ) ) // do the conversion
+            density = density_arg;
+    }
 
 
-
-
-    // ASTAR CANNOT FIND THE GOAL IN BIDIRECTIONAL VARIANT
-
-    RRT rrt( start, goal, GOAL_EPSILON, 2000 );
-    //BidirectionalRRT rrt( start, goal, 15, 2000 );
-    //rrt.setGoalSkewProbability(50);
-
-    rrt.go();
-    rrt.displayPDF( "tempOut" );
+    World world;
+    world.setWindowSize( window_size );
+    world.createRandomMap( grid_size, density );
+    world.run();
 
     return EXIT_SUCCESS;
+
 }

@@ -50,6 +50,10 @@
 			<Add option="-fexceptions" />
 			<Add option="-frounding-math" />
 			<Add option="-std=c++17" />
+			<Add directory="../../../usr/include/reactphysics3d-0.7.1/src" />
+			<Add directory="../../../usr/include/box2d/include/" />
+			<Add directory="../../../usr/include/box2d/include/box2d" />
+			<Add directory="../../../usr/local/include/SDL2" />
 		</Compiler>
 		<Linker>
 			<Add library="gmp" />
@@ -57,17 +61,31 @@
 			<Add library="CGAL" />
 			<Add library="boost_system" />
 			<Add library="boost_thread" />
+			<Add library="box2d" />
+			<Add library="../../../usr/local/lib/libSDL2.a" />
+			<Add library="GL" />
+			<Add library="pthread" />
+			<Add library="dl" />
+			<Add directory="../../../usr/include/reactphysics3d-0.7.1/lib" />
+			<Add directory="../../../usr/include/box2d/build/src" />
+			<Add directory="../../../usr/local/lib" />
+			<Add directory="../../../usr/lib/x86_64-linux-gnu" />
 		</Linker>
 		<Unit filename="include/Astar.h" />
-		<Unit filename="include/BidirectionalRRT.h" />
 		<Unit filename="include/CgalComponents.h" />
+		<Unit filename="include/Map.h" />
+		<Unit filename="include/Point2.h" />
 		<Unit filename="include/RRT.h" />
+		<Unit filename="include/RRTstar.h" />
+		<Unit filename="include/World.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="src/BidirectionalRRT.cpp" />
+		<Unit filename="src/Map.cpp" />
 		<Unit filename="src/RRT.cpp" />
+		<Unit filename="src/World.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

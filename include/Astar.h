@@ -1,7 +1,9 @@
 #ifndef ASTAR_H
 #define ASTAR_H
 
-#include "../include/CgalComponents.h"
+//#include "../include/CgalComponents.h"
+//#include "RRT.h"
+#include "Point2.h"
 
 namespace MAG {
 
@@ -9,15 +11,14 @@ namespace MAG {
      * Exception for termination of search.
      */
     struct found_goal {
-        Vertex vertex;
+        MAG::Vertex vertex;
     };
 
     template< class CostType >
-    CostType distanceBetween( Point p, Point q ) {
-//        CostType dx = p.x() - q.x();
-//        CostType dy = p.y() - q.y();
-//        return std::sqrt( dx * dx + dy * dy );
-        return CGAL::sqrt<NumberType>( CGAL::squared_distance<K>( p, q ) );
+    CostType distanceBetween( MAG::Point p, MAG::Point q ) {
+        CostType res = CGAL::sqrt<CostType>( CGAL::squared_distance<K>( p, q ) );
+        //std::cout<<"distance Between(p,q):"<<res<<std::endl;
+        return res;
     }
 
     /*
@@ -28,17 +29,17 @@ namespace MAG {
     class distance_heuristic : public boost::astar_heuristic<GraphType, CostType> {
 
         public:
-            distance_heuristic( LocMap l, GraphVertex goal )
+            distance_heuristic( LocMap l, MAG::GraphVertex goal )
                 : m_location(l), m_goal(goal)
             {
 
             }
-            CostType operator()( GraphVertex u ) {
+            CostType operator()( MAG::GraphVertex u ) {
                 return distanceBetween<CostType>( m_location[m_goal].point, m_location[u].point );
             }
 
         private:
-            GraphVertex m_goal;
+            MAG::GraphVertex m_goal;
             LocMap m_location;
     };
 
@@ -56,13 +57,14 @@ namespace MAG {
             void examine_vertex(GVertex u, GraphType& g) {
                 //std::cout << m_location[u].point << std::endl;
                 if( u == m_goal || distanceBetween<CostType>( m_location[m_goal].point, m_location[u].point ) < epsilon ) {
-                    Vertex v = { m_location[u].point, u };
-                    throw v;
+                    throw m_location[u];
+//                    Vertex v = { m_location[u].point };
+//                    throw v;
                 }
             }
         private:
             GVertex m_goal;
-            CostType epsilon = GOAL_EPSILON;
+            CostType epsilon = MAG::GOAL_EPSILON;
             LocMap m_location;
     };
 
