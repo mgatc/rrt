@@ -17,7 +17,6 @@ add_executable(rrt
         include/Astar.h
         include/RRT.h
         include/RRTstar.h
-#        include/CgalComponents.h
         src/Map.cpp include/Map.h
         src/World.cpp include/World.h
 
