@@ -1,8 +1,8 @@
 #ifndef RRTSTAR_H
 #define RRTSTAR_H
 
-#include "../include/RRT.h"
-#include "../include/Astar.h"
+#include "RRT.h"
+#include "Astar.h"
 
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/nearest_neighbor_delaunay_2.h>
@@ -20,32 +20,17 @@ class RRTstar : public RRT<W> {
     using RRT<W>::insertEdge;
 
 public:
-    /* Public data members */
-
     /* Constructor(s) */
         RRTstar( W& world, double start_x, double start_y, double goal_x, double goal_y,
                  double step, int maxNodes, unsigned seed );
-        // should probably make RRT templated
-
-    /* Public member functions */
 
 protected:
-    /* Protected data members */
-
     /* Protected RRT specified functions */
         void buildRRT();
         Vertex chooseParent( std::list<GraphVertex>& Znear, Vertex nearest, Vertex xNew );
         void nearestNeighbors( std::list<GraphVertex>& Znear, Vertex z, int n );
         void rewire( std::list<GraphVertex> Znear, Vertex zMin, Vertex xNew  );
         void reconnect( Vertex xNew, Vertex zNear );
-
-
-        //void steer( Vertex p, Vertex q );
-
-    /* Protected member functions */
-
-private:
-
 };
 
 /* Constructor(s) */
@@ -149,9 +134,6 @@ void RRTstar<W>::nearestNeighbors( std::list<GraphVertex>& Znear, Vertex z, int 
         Znear.push_back( handle->info() );
     }
 
-//    for( unsigned i=0; i<n-1; i++ ) {
-//        Znear.push_back( handles[i]->info() );
-//    }
 }
 
 

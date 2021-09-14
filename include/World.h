@@ -1,14 +1,15 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include <memory>
+
 #include <box2d.h>
+
 #include "Map.h"
 #include "Point2.h"
 #include "RRTstar.h"
 
 namespace MAG {
-
-//class RRTstar;
 
 class World {
 public:
@@ -47,8 +48,8 @@ protected:
     Map m_map;
     //std::optional<Point2> m_start = std::nullopt;
     //Point2 m_goal;
-    b2World* m_world = nullptr;
-    RRTstar<World>* m_agent = nullptr;
+    std::unique_ptr<b2World> m_world;
+    std::unique_ptr<RRTstar<World>> m_agent;
 
     b2Body* addAgent( double x, double y, double w, double h );
     b2Body* addRect( double x, double y, double w, double h, int angle, bool dyn=false );

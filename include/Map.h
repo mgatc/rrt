@@ -3,9 +3,8 @@
 
 #include <map>                              // storing obstacles
 #include <string>
+
 #include "Point2.h"
-
-
 
 namespace MAG {
 
@@ -20,16 +19,16 @@ public:
         Map();
 
     /* Public member functions */
-        void createRandom( int size, double density );
+        void createRandom( size_t size, double density );
         void displayPDF( std::string outputFileName );
-        int getSize();
+        size_t getSize();
         double getDensity();
 
 protected:
     /* Protected types */
 
     /* Protected data members */
-        int m_size;
+        size_t m_size;
         double m_density;
 
     /* Protected member functions */

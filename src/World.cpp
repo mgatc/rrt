@@ -1,17 +1,16 @@
-
+#include "World.h"
 
 #include <chrono>
 #include <cmath>
 #include <cstdlib>     /* srand, rand */
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
-
-#include "World.h"
 
 using namespace MAG;
 
@@ -58,7 +57,7 @@ void World::startAgent( double start_x, double start_y, double goal_x, double go
     int seed = std::rand();
 
     // RRT
-    m_agent = new RRTstar<World>( *this, start_x, start_y, goal_x, goal_y, step, persistence, seed ); // set last argument for random seed
+    m_agent = std::unique_ptr<RRTstar<World>>(new RRTstar<World>( *this, start_x, start_y, goal_x, goal_y, step, persistence, seed )); // set last argument for random seed
     m_agent->setGoalSkewProbability( 0.19 );
 
     Cost pathCost=-1;
@@ -265,10 +264,10 @@ int World::run() {
     SDL_DestroyWindow( window );
     SDL_Quit();
 
-    if( m_world != nullptr )
-        delete m_world;
-    if( m_agent != nullptr )
-        delete m_agent;
+//    if( m_world != nullptr )
+//        delete m_world;
+//    if( m_agent != nullptr )
+//        delete m_agent;
 
     return EXIT_SUCCESS;
 }
@@ -310,6 +309,9 @@ void World::drawSquare( b2Vec2* points, b2Vec2 center, double angle, b2BodyType 
         case b2_dynamicBody:
             glColor3f( 0, 1, 1 );
             //std::cout<<"printing dynamic body"<<std::endl;
+            break;
+
+        case b2_kinematicBody:
             break;
     }
 
@@ -402,6 +404,7 @@ void World::display() {
     glLoadIdentity();
     b2Body* tmp = m_world->GetBodyList();
     b2Vec2 points[4];
+
     while( tmp ) {
         b2Shape* shape = tmp->GetFixtureList()->GetShape();
         switch( shape->GetType() ) {
@@ -415,6 +418,11 @@ void World::display() {
 
         case b2Shape::Type::e_edge:
             drawEdge( ((b2EdgeShape*)shape)->m_vertex1, ((b2EdgeShape*)shape)->m_vertex2, tmp->GetWorldCenter() );
+            break;
+
+        case b2Shape::Type::e_circle:
+        case b2Shape::Type::e_chain:
+        case b2Shape::Type::e_typeCount:
             break;
         }
         tmp = tmp->GetNext();
@@ -438,7 +446,7 @@ void World::initGL() {
 }
 
 void World::initWorld( double gx, double gy ) {
-    m_world = new b2World( b2Vec2( gx,gy ) ); // x and y gravitational forces
+    m_world = std::unique_ptr<b2World>(new b2World( b2Vec2( gx,gy ) ) ); // x and y gravitational forces
     // create new map, addRect to add obstacles to world
     if( !m_map.m_obstacles.empty() )
         for( auto it = m_map.m_obstacles.begin(); it != m_map.m_obstacles.end(); it++ ) {

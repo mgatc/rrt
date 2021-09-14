@@ -2,23 +2,11 @@
 #define RRT_H
 
 #include "Astar.h"
-
-
-
 #include "Point2.h"
 
-
-
-
 namespace MAG {
-//
-//    typedef CGAL::Exact_predicates_inexact_constructions_kernel
-//        K;
 
-    enum Result { Advanced, Trapped, Reached };
-
-
-
+enum Result { Advanced, Trapped, Reached };
 
 template< class W >
 class RRT {
@@ -33,12 +21,12 @@ public:
         RRT( W& world, double start_x, double start_y, double goal_x, double goal_y,
           double step, int maxNodes, unsigned seed )
                                       : m_world( world ),
+                                        size( world.getSize() ),
                                         K( maxNodes ),
                                         epsilon( step ),
+                                        T(K),
                                         rnd( seed ),
-                                        size( world.getSize() ),
-                                        g1( size, rnd ),
-                                        T(K)
+                                        g1( size, rnd )
         {
             startv.point = Point( start_x, start_y );
             std::cout<<startv.point;
@@ -74,7 +62,7 @@ protected:
 
 
     /* Protected data members */
-        W m_world;
+        W& m_world;
         Vertex startv;
         Vertex goalv;
         Vertex found_goalv;
@@ -350,7 +338,7 @@ Vertex RRT<W>::insertIntoTree( DelaunayTriangulation &Dt, Vertex v, std::optiona
     if( parent )
         v.cost = cost( *parent, v );
     // if vertex already has gv, don't rebuild v
-    if( v.graph == NULL )
+    if( v.graph == SIZE_T_MAX )
         v = insertVertex( Dt, v );
 
     if( parent ) // if parent is set, add an edge from parentIndex to new vertex
@@ -459,8 +447,7 @@ Vertex RRT<W>::getVertex( DtVertex handle ) {
 
 template< class W >
 Cost RRT<W>::goalCost() {
-    if( pathExists() )
-        return thePath.back().cost;
+    return pathExists() ? thePath.back().cost : std::numeric_limits<double>::infinity();
 }
 
 // Returns the actual cost from start to parent plus the estimated cost from parent to child

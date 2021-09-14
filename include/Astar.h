@@ -1,8 +1,6 @@
 #ifndef ASTAR_H
 #define ASTAR_H
 
-//#include "../include/CgalComponents.h"
-//#include "RRT.h"
 #include "Point2.h"
 
 namespace MAG {
@@ -39,8 +37,8 @@ namespace MAG {
             }
 
         private:
-            MAG::GraphVertex m_goal;
             LocMap m_location;
+        MAG::GraphVertex m_goal;
     };
 
 
